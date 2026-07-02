@@ -727,9 +727,27 @@ img { max-width: 100%; height: auto; }
   border: 2px solid transparent;
 }
 
+.menu-item.has-image {
+  padding: 12px 20px 12px 12px;
+}
+
 .menu-item:hover {
   box-shadow: var(--shadow-md);
   border-color: var(--red-light);
+}
+
+.menu-item-img {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.menu-item-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .menu-item-info {

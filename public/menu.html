@@ -147,7 +147,11 @@
 
           items.forEach(function(item) {
             var qty = getCartQty(item.id);
-            html += '<div class="menu-item" data-id="' + item.id + '">';
+            var imgName = MENU_IMAGES[item.id];
+            html += '<div class="menu-item' + (imgName ? ' has-image' : '') + '" data-id="' + item.id + '">';
+            if (imgName) {
+              html += '<div class="menu-item-img"><img src="/images/' + imgName + '.jpg" alt="' + escName(item.name) + '" loading="lazy"></div>';
+            }
             html += '<div class="menu-item-info">';
             html += '<div class="menu-item-name">' + item.name + '</div>';
             if (item.desc) {

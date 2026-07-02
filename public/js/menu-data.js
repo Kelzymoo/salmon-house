@@ -236,6 +236,35 @@ const MENU = {
   }
 };
 
+const MENU_IMAGES = {
+  // Sushi Specials
+  ss1: 'wasabi-parcel', ss2: 'crunch-roll', ss3: 'philadelphia-roll', ss4: 'samurai-roll',
+  ss5: 'salmon-roses', ss6: 'prawn-roses', ss7: 'rainbow-roll', ss8: 'dragon-flower',
+  ss9: 'bamboo-roll', ss10: 'salmon-grenades', ss11: 'cairns-roll', ss12: 'creamy-prawn-roses',
+  ss13: 'rock-prawn-roll', ss14: 'jalapeno-salmon',
+  // Sushi categories
+  sa1: 'sashimi', sa2: 'sashimi', ni1: 'nigiri', ni2: 'nigiri', ni3: 'nigiri',
+  mk1: 'maki', mk2: 'maki', mk3: 'maki', mk4: 'maki',
+  cr1: 'california-roll', cr2: 'california-roll', cr3: 'california-roll', cr4: 'california-roll', cr5: 'california-roll',
+  fs1: 'fashion-sandwich', fs2: 'fashion-sandwich', fs3: 'fashion-sandwich',
+  hr1: 'hand-roll', hr2: 'hand-roll', hr3: 'hand-roll', hr4: 'hand-roll', hr5: 'hand-roll',
+  pb1: 'poke-bowl',
+  // Combos & Platters
+  cp1: 'combo-1', cp2: 'combo-2', cp3: 'combo-3', cp4: 'combo-4',
+  cp5: 'combo-5', cp6: 'combo-6', cp7: 'combo-7', cp8: 'combo-8',
+  cp9: 'vegetable-platter', cp10: 'salmon-platter', cp11: 'prawn-platter', cp12: 'family-platter',
+  // Asian dishes
+  s1: 'spring-rolls', s2: 'spring-rolls', s3: 'spring-rolls', s4: 'spring-rolls', s5: 'spring-rolls',
+  s7: 'dumplings', s8a: 'dumplings', s8b: 'dumplings', s8c: 'dumplings',
+  s9a: 'dumplings', s9b: 'dumplings', s9c: 'dumplings',
+  b1: 'beef-dish', b2: 'beef-dish', b3: 'beef-dish', b4: 'beef-dish', b5: 'beef-dish',
+  nr2: 'noodles-pork', nr3: 'noodles-beef', nr4: 'noodles-seafood', nr5: 'noodles-prawn',
+  t1: 'tom-yum-soup',
+  t3a: 'green-curry', t3b: 'green-curry', t3c: 'green-curry', t3d: 'green-curry',
+  t4a: 'red-curry', t4b: 'red-curry', t4c: 'red-curry', t4d: 'red-curry',
+  t5a: 'pad-thai', t5b: 'pad-thai',
+};
+
 const MENU_SECTIONS = [
   { key: 'sushiSpecials', label: 'Sushi Specials', group: 'sushi' },
   { key: 'sashimi', label: 'Sashimi', group: 'sushi' },
