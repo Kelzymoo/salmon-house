@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Menu | Salmon House - Ceres</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍣</text></svg>">
+</head>
+<body class="menu-page">
+  <!-- NAVBAR -->
+  <nav class="navbar scrolled" id="navbar">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo">
+        <div class="nav-logo-icon">SH</div>
+        Salmon House
+      </a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="/">Home</a></li>
+        <li><a href="/menu.html" class="active">Menu</a></li>
+        <li><a href="/#about">About</a></li>
+        <li><a href="/#contact">Contact</a></li>
+      </ul>
+      <a href="/checkout.html" class="nav-cart">
+        <span>&#128722;</span> Cart
+        <span class="cart-badge hidden">0</span>
+      </a>
+      <button class="mobile-toggle" onclick="document.getElementById('navLinks').classList.toggle('open')">&#9776;</button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <div class="menu-hero">
+    <h1>Our Menu</h1>
+    <p>Over 100 dishes &mdash; sushi, Asian mains, Thai curries &amp; more</p>
+  </div>
+
+  <!-- MENU LAYOUT -->
+  <div class="menu-layout">
+    <!-- Sidebar -->
+    <aside class="menu-sidebar" id="menuSidebar">
+      <div class="sidebar-group">
+        <div class="sidebar-group-title">Loading...</div>
+      </div>
+    </aside>
+
+    <!-- Content -->
+    <main class="menu-content" id="menuContent">
+      <div class="menu-search">
+        <input type="text" class="search-input" id="searchInput" placeholder="Search the menu...">
+      </div>
+      <div class="filter-tabs" id="filterTabs">
+        <button class="filter-tab active" data-filter="all">All</button>
+        <button class="filter-tab" data-filter="sushi">Sushi</button>
+        <button class="filter-tab" data-filter="asian">Asian Mains</button>
+        <button class="filter-tab" data-filter="extras">Extras</button>
+      </div>
+      <div id="menuSections"></div>
+    </main>
+  </div>
+
+  <!-- Floating cart -->
+  <div class="floating-cart">
+    <a href="/checkout.html" class="floating-cart-btn">
+      &#128722; <span class="floating-count">0</span> items &mdash; <span class="floating-total">R0.00</span> &#8594;
+    </a>
+  </div>
+
+  <script src="/js/menu-data.js"></script>
+  <script src="/js/cart.js"></script>
+  <script>
+    (function() {
+      var menuSectionsEl = document.getElementById('menuSections');
+      var menuSidebarEl = document.getElementById('menuSidebar');
+      var searchInput = document.getElementById('searchInput');
+      var filterTabsEl = document.getElementById('filterTabs');
+      var currentFilter = 'all';
+
+      function buildSidebar() {
+        var groups = {};
+        MENU_SECTIONS.forEach(function(s) {
+          if (!groups[s.group]) groups[s.group] = [];
+          groups[s.group].push(s);
+        });
+
+        var labels = { sushi: 'Sushi', asian: 'Asian Dishes', extras: 'Extras' };
+        var html = '';
+        Object.keys(groups).forEach(function(g) {
+          html += '<div class="sidebar-group">';
+          html += '<div class="sidebar-group-title">' + (labels[g] || g) + '</div>';
+          groups[g].forEach(function(s) {
+            html += '<a class="sidebar-link" href="#section-' + s.key + '">' + s.label + '</a>';
+          });
+          html += '</div>';
+        });
+        menuSidebarEl.innerHTML = html;
+
+        menuSidebarEl.addEventListener('click', function(e) {
+          var link = e.target.closest('.sidebar-link');
+          if (!link) return;
+          e.preventDefault();
+          var target = document.getElementById(link.getAttribute('href').slice(1));
+          if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          var allLinks = menuSidebarEl.querySelectorAll('.sidebar-link');
+          allLinks.forEach(function(l) { l.classList.remove('active'); });
+          link.classList.add('active');
+        });
+      }
+
+      function getCartQty(id) {
+        var items = Cart.getItems();
+        for (var i = 0; i < items.length; i++) {
+          if (items[i].id === id) return items[i].qty;
+        }
+        return 0;
+      }
+
+      function escName(name) {
+        return name.replace(/'/g, '&#39;').replace(/"/g, '&quot;');
+      }
+
+      function renderMenu() {
+        var search = searchInput.value.toLowerCase();
+        var html = '';
+
+        MENU_SECTIONS.forEach(function(section) {
+          if (currentFilter !== 'all' && section.group !== currentFilter) return;
+
+          var category = MENU[section.key];
+          if (!category) return;
+
+          var items = category.items;
+          if (search) {
+            items = items.filter(function(i) {
+              return i.name.toLowerCase().indexOf(search) !== -1 ||
+                     (i.desc && i.desc.toLowerCase().indexOf(search) !== -1);
+            });
+          }
+          if (items.length === 0) return;
+
+          html += '<div class="menu-section" id="section-' + section.key + '">';
+          html += '<h2 class="menu-section-title">' + category.name + '</h2>';
+          if (category.note) {
+            html += '<p class="menu-section-note">' + category.note + '</p>';
+          }
+          html += '<div class="menu-grid">';
+
+          items.forEach(function(item) {
+            var qty = getCartQty(item.id);
+            html += '<div class="menu-item" data-id="' + item.id + '">';
+            html += '<div class="menu-item-info">';
+            html += '<div class="menu-item-name">' + item.name + '</div>';
+            if (item.desc) {
+              html += '<div class="menu-item-desc">' + item.desc + '</div>';
+            }
+            html += '</div>';
+            html += '<div class="menu-item-actions">';
+            html += '<span class="menu-item-price">R' + item.price + '</span>';
+
+            if (qty > 0) {
+              html += '<div class="qty-control">';
+              html += '<button class="qty-btn" data-action="dec" data-id="' + item.id + '">-</button>';
+              html += '<span class="qty-value">' + qty + '</span>';
+              html += '<button class="qty-btn" data-action="inc" data-id="' + item.id + '">+</button>';
+              html += '</div>';
+            } else {
+              html += '<button class="add-item-btn" data-add="' + item.id + '" data-name="' + escName(item.name) + '" data-price="' + item.price + '" title="Add to cart">+</button>';
+            }
+
+            html += '</div></div>';
+          });
+
+          html += '</div></div>';
+        });
+
+        if (!html) {
+          html = '<div style="text-align:center;padding:60px;color:var(--gray-500);"><p style="font-size:2rem;margin-bottom:12px;">&#128269;</p><p>No items found.</p></div>';
+        }
+
+        menuSectionsEl.innerHTML = html;
+      }
+
+      // Event delegation for add/qty buttons
+      menuSectionsEl.addEventListener('click', function(e) {
+        var addBtn = e.target.closest('[data-add]');
+        if (addBtn) {
+          Cart.addItem({
+            id: addBtn.getAttribute('data-add'),
+            name: addBtn.getAttribute('data-name').replace(/&#39;/g, "'").replace(/&quot;/g, '"'),
+            price: Number(addBtn.getAttribute('data-price'))
+          });
+          renderMenu();
+          return;
+        }
+
+        var qtyBtn = e.target.closest('[data-action]');
+        if (qtyBtn) {
+          var id = qtyBtn.getAttribute('data-id');
+          var action = qtyBtn.getAttribute('data-action');
+          var currentQty = getCartQty(id);
+          Cart.updateQty(id, action === 'inc' ? currentQty + 1 : currentQty - 1);
+          renderMenu();
+        }
+      });
+
+      // Filter tabs
+      filterTabsEl.addEventListener('click', function(e) {
+        var tab = e.target.closest('.filter-tab');
+        if (!tab) return;
+        currentFilter = tab.getAttribute('data-filter');
+        filterTabsEl.querySelectorAll('.filter-tab').forEach(function(t) {
+          t.classList.remove('active');
+        });
+        tab.classList.add('active');
+        renderMenu();
+      });
+
+      // Search
+      var searchTimeout;
+      searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(renderMenu, 200);
+      });
+
+      // Intersection observer for sidebar highlighting
+      function setupObserver() {
+        if (!window.IntersectionObserver) return;
+        var observer = new IntersectionObserver(function(entries) {
+          entries.forEach(function(entry) {
+            if (entry.isIntersecting) {
+              var id = entry.target.id;
+              menuSidebarEl.querySelectorAll('.sidebar-link').forEach(function(l) {
+                l.classList.toggle('active', l.getAttribute('href') === '#' + id);
+              });
+            }
+          });
+        }, { rootMargin: '-100px 0px -70% 0px' });
+
+        document.querySelectorAll('.menu-section').forEach(function(s) {
+          observer.observe(s);
+        });
+      }
+
+      // Init
+      buildSidebar();
+      renderMenu();
+      setupObserver();
+    })();
+  </script>
+</body>
+</html>

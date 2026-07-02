@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard | Salmon House</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/dashboard/dashboard.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍣</text></svg>">
+</head>
+<body>
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">SH</div>
+      <div>
+        <div class="brand-name">Salmon House</div>
+        <div class="brand-sub">Dashboard</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="#" class="nav-item active" data-view="orders">
+        <span class="nav-icon">&#128230;</span>
+        Orders
+        <span class="nav-badge" id="pendingBadge">0</span>
+      </a>
+      <a href="#" class="nav-item" data-view="stats">
+        <span class="nav-icon">&#128200;</span>
+        Statistics
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="sound-toggle">
+        <label class="toggle-label">
+          <span>&#128264; Sound Alerts</span>
+          <input type="checkbox" id="soundToggle" checked>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <a href="/" class="nav-item" style="margin-top:8px;">
+        <span class="nav-icon">&#127760;</span>
+        View Website
+      </a>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main-content">
+    <!-- HEADER -->
+    <header class="dash-header">
+      <div>
+        <h1 id="pageTitle">Orders</h1>
+        <p class="dash-date" id="currentDate"></p>
+      </div>
+      <div class="header-actions">
+        <div class="connection-status" id="connectionStatus">
+          <span class="status-dot-live"></span> Live
+        </div>
+        <button class="btn-refresh" onclick="loadOrders()">&#8635; Refresh</button>
+      </div>
+    </header>
+
+    <!-- STATS BAR -->
+    <div class="stats-bar" id="statsBar">
+      <div class="stat-card">
+        <div class="stat-value" id="statTodayOrders">0</div>
+        <div class="stat-label">Today's Orders</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="statRevenue">R0</div>
+        <div class="stat-label">Today's Revenue</div>
+      </div>
+      <div class="stat-card accent">
+        <div class="stat-value" id="statPending">0</div>
+        <div class="stat-label">Pending</div>
+      </div>
+      <div class="stat-card success">
+        <div class="stat-value" id="statReady">0</div>
+        <div class="stat-label">Ready for Pickup</div>
+      </div>
+    </div>
+
+    <!-- ORDERS VIEW -->
+    <div class="view-section" id="ordersView">
+      <!-- Filters -->
+      <div class="order-filters">
+        <div class="filter-chips">
+          <button class="chip active" data-status="all">All</button>
+          <button class="chip" data-status="new">&#128308; New</button>
+          <button class="chip" data-status="confirmed">&#128992; Confirmed</button>
+          <button class="chip" data-status="preparing">&#128993; Preparing</button>
+          <button class="chip" data-status="ready">&#128994; Ready</button>
+          <button class="chip" data-status="collected">&#9899; Collected</button>
+          <button class="chip" data-status="cancelled">&#10060; Cancelled</button>
+        </div>
+        <input type="date" class="date-filter" id="dateFilter">
+      </div>
+
+      <!-- Orders list -->
+      <div class="orders-list" id="ordersList">
+        <div class="empty-state">
+          <p style="font-size:3rem;">&#128230;</p>
+          <h3>No orders yet</h3>
+          <p>New orders will appear here in real-time.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ORDER DETAIL MODAL -->
+    <div class="modal-overlay" id="orderModal" style="display:none;">
+      <div class="modal">
+        <div class="modal-header">
+          <h2 id="modalTitle">Order Details</h2>
+          <button class="modal-close" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="modal-body" id="modalBody"></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Notification sound (generated programmatically) -->
+  <script src="/dashboard/dashboard.js"></script>
+</body>
+</html>

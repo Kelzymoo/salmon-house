@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Track Order | Salmon House</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍣</text></svg>">
+</head>
+<body class="status-page">
+  <!-- NAVBAR -->
+  <nav class="navbar scrolled">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo">
+        <div class="nav-logo-icon">SH</div>
+        Salmon House
+      </a>
+      <ul class="nav-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/menu.html">Menu</a></li>
+      </ul>
+      <a href="/checkout.html" class="nav-cart">
+        <span>&#128722;</span> Cart
+        <span class="cart-badge hidden">0</span>
+      </a>
+    </div>
+  </nav>
+
+  <div style="padding-top: 72px; background: var(--off-white); min-height: 100vh;">
+    <div class="status-card" id="statusCard">
+      <div style="text-align:center; padding:40px; color:var(--gray-500);">
+        <p style="font-size:2rem; margin-bottom:12px;">&#128269;</p>
+        <p>Loading order details...</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/cart.js"></script>
+  <script>
+    const STATUS_STEPS = ['new', 'confirmed', 'preparing', 'ready', 'collected'];
+    const STATUS_LABELS = {
+      new: 'Received',
+      confirmed: 'Confirmed',
+      preparing: 'Preparing',
+      ready: 'Ready',
+      collected: 'Collected',
+      cancelled: 'Cancelled'
+    };
+    const STATUS_ICONS = {
+      new: '&#128229;',
+      confirmed: '&#9989;',
+      preparing: '&#127859;',
+      ready: '&#127881;',
+      collected: '&#128077;',
+      cancelled: '&#10060;'
+    };
+
+    // Extract order ID from URL
+    const pathParts = window.location.pathname.split('/');
+    const orderId = pathParts[pathParts.length - 1];
+
+    async function loadOrder() {
+      try {
+        const res = await fetch(`/api/orders/${orderId}`);
+        if (!res.ok) throw new Error('Order not found');
+        const order = await res.json();
+        renderOrder(order);
+      } catch (e) {
+        document.getElementById('statusCard').innerHTML = `
+          <div style="text-align:center; padding:40px;">
+            <p style="font-size:3rem; margin-bottom:16px;">&#128533;</p>
+            <h2>Order Not Found</h2>
+            <p style="color:var(--gray-500); margin-bottom:24px;">We couldn't find an order with ID: ${orderId}</p>
+            <a href="/menu.html" class="btn btn-primary">Order Something Delicious</a>
+          </div>
+        `;
+      }
+    }
+
+    function renderOrder(order) {
+      const currentStep = STATUS_STEPS.indexOf(order.order_status);
+      const isCancelled = order.order_status === 'cancelled';
+
+      let stepsHtml = '';
+      STATUS_STEPS.forEach((step, i) => {
+        let cls = '';
+        if (isCancelled) cls = '';
+        else if (i < currentStep) cls = 'completed';
+        else if (i === currentStep) cls = 'active';
+
+        stepsHtml += `
+          <div class="status-step ${cls}">
+            <div class="status-dot">${i < currentStep ? '&#10003;' : (i === currentStep ? STATUS_ICONS[step] : i + 1)}</div>
+            <span class="status-step-label">${STATUS_LABELS[step]}</span>
+          </div>
+        `;
+      });
+
+      const pickupDate = new Date(order.pickup_date + 'T00:00:00');
+      const dateStr = pickupDate.toLocaleDateString('en-ZA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+      // Format time
+      const [h, m] = order.pickup_time.split(':');
+      const hour = parseInt(h);
+      const timeStr = `${hour > 12 ? hour - 12 : hour}:${m} ${hour >= 12 ? 'PM' : 'AM'}`;
+
+      let itemsHtml = '';
+      order.items.forEach(item => {
+        itemsHtml += `
+          <div class="summary-item">
+            <div class="summary-item-info">
+              <div class="summary-item-name">${item.name}</div>
+              <div class="summary-item-qty">Qty: ${item.qty}</div>
+            </div>
+            <span class="summary-item-price">R${(item.price * item.qty).toFixed(2)}</span>
+          </div>
+        `;
+      });
+
+      document.getElementById('statusCard').innerHTML = `
+        <div class="status-header">
+          <div class="status-icon">${isCancelled ? '&#10060;' : STATUS_ICONS[order.order_status]}</div>
+          <h2>${isCancelled ? 'Order Cancelled' : 'Order ' + STATUS_LABELS[order.order_status]}</h2>
+          <p style="color:var(--gray-500);">Order #${order.id}</p>
+        </div>
+
+        ${!isCancelled ? `<div class="status-tracker">${stepsHtml}</div>` : ''}
+
+        <div class="order-details">
+          <div class="order-detail-row">
+            <span class="label">Customer</span>
+            <span>${order.customer_name}</span>
+          </div>
+          <div class="order-detail-row">
+            <span class="label">Phone</span>
+            <span>${order.customer_phone}</span>
+          </div>
+          <div class="order-detail-row">
+            <span class="label">Pickup Date</span>
+            <span>${dateStr}</span>
+          </div>
+          <div class="order-detail-row">
+            <span class="label">Pickup Time</span>
+            <span>${timeStr}</span>
+          </div>
+          <div class="order-detail-row">
+            <span class="label">Payment</span>
+            <span style="color: ${order.payment_status === 'paid' ? 'var(--green)' : 'var(--gold)'}; font-weight:600;">
+              ${order.payment_status === 'paid' ? '&#10003; Paid' : 'Pending'}
+            </span>
+          </div>
+          ${order.special_instructions ? `
+          <div class="order-detail-row">
+            <span class="label">Instructions</span>
+            <span>${order.special_instructions}</span>
+          </div>
+          ` : ''}
+        </div>
+
+        <h3 style="margin-top:24px; margin-bottom:12px; font-size:1rem;">Items Ordered</h3>
+        <div class="summary-items">${itemsHtml}</div>
+        <div class="summary-totals">
+          <div class="summary-row total">
+            <span>Total</span>
+            <span class="summary-price">R${order.total.toFixed(2)}</span>
+          </div>
+        </div>
+
+        <div style="text-align:center; margin-top:32px;">
+          <a href="/menu.html" class="btn btn-primary">Order Again</a>
+        </div>
+      `;
+    }
+
+    loadOrder();
+
+    // Auto-refresh every 15 seconds
+    setInterval(loadOrder, 15000);
+  </script>
+</body>
+</html>

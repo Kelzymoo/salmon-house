@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Salmon House | Sushi & Asian Food - Ceres</title>
+  <meta name="description" content="Fresh sushi, Asian dishes & Thai cuisine in Ceres. Order online for pickup.">
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍣</text></svg>">
+</head>
+<body>
+  <!-- NAVBAR -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo">
+        <div class="nav-logo-icon">SH</div>
+        Salmon House
+      </a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="/" class="active">Home</a></li>
+        <li><a href="/menu.html">Menu</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+      <a href="/checkout.html" class="nav-cart">
+        <span>&#128722;</span> Cart
+        <span class="cart-badge hidden">0</span>
+      </a>
+      <button class="mobile-toggle" onclick="document.getElementById('navLinks').classList.toggle('open')">&#9776;</button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <div class="hero-text">
+        <div class="hero-badge">&#11088; Ceres' Favourite Sushi Spot</div>
+        <h1>
+          Fresh Sushi &
+          <span>Asian Flavours</span>
+        </h1>
+        <p class="hero-desc">
+          Handcrafted sushi, authentic Asian dishes & Thai cuisine made with the freshest ingredients.
+          Order online and pick up at your convenience.
+        </p>
+        <div class="hero-actions">
+          <a href="/menu.html" class="btn btn-primary btn-lg">Order Now &#8594;</a>
+          <a href="#about" class="btn btn-outline btn-lg">Learn More</a>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="hero-img-wrap">
+          <img src="https://images.unsplash.com/photo-1553621042-f6e147245754?w=600&q=80" alt="Fresh sushi platter">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="section features">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-label">How It Works</span>
+        <h2>Order in 3 Simple Steps</h2>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">&#128203;</div>
+          <h3>Browse Our Menu</h3>
+          <p>Choose from over 100 items — sushi, Asian mains, Thai curries, combos & platters.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">&#128179;</div>
+          <h3>Pay Securely with Yoco</h3>
+          <p>Fast, safe online payment. Your card details are never stored on our servers.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">&#128230;</div>
+          <h3>Pick Up & Enjoy</h3>
+          <p>Schedule your pickup time and collect your freshly prepared order.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- POPULAR ITEMS -->
+  <section class="section" id="popular">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-label">Customer Favourites</span>
+        <h2>Most Popular Items</h2>
+        <p>Our best sellers, loved by the Ceres community</p>
+      </div>
+      <div class="popular-grid" id="popularGrid"></div>
+      <div style="text-align:center; margin-top: 40px;">
+        <a href="/menu.html" class="btn btn-primary btn-lg">View Full Menu &#8594;</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- INFO BAR -->
+  <section class="info-bar" id="about">
+    <div class="info-grid">
+      <div class="info-item">
+        <h3>&#128205; Location</h3>
+        <p>25 Voortrekker Road<br>Ceres, 6835</p>
+      </div>
+      <div class="info-item">
+        <h3>&#128336; Hours</h3>
+        <p>11:00 - 22:00<br>Open Every Day</p>
+      </div>
+      <div class="info-item">
+        <h3>&#128222; Phone</h3>
+        <p>084 301 1707</p>
+      </div>
+      <div class="info-item">
+        <h3>&#128172; WhatsApp</h3>
+        <p>084 301 1707</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="section">
+    <div class="container">
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;">
+        <div>
+          <span class="section-label">Our Story</span>
+          <h2 style="font-size: 2rem; margin-bottom: 16px;">Authentic Asian Cuisine in the Heart of Ceres</h2>
+          <p style="color: var(--gray-500); line-height: 1.8; margin-bottom: 16px;">
+            Salmon House brings the finest sushi and Asian cuisine to the Witzenberg Valley.
+            Every roll is handcrafted, every dish made fresh with quality ingredients.
+          </p>
+          <p style="color: var(--gray-500); line-height: 1.8; margin-bottom: 24px;">
+            From our signature Salmon Roses and Dragon Flower rolls to classic Thai curries and
+            stir-fried noodles, we offer a diverse menu that caters to every palate.
+          </p>
+          <a href="/menu.html" class="btn btn-primary">Explore Our Menu</a>
+        </div>
+        <div style="border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-xl);">
+          <img src="https://images.unsplash.com/photo-1617196034796-73dfa7b1fd56?w=600&q=80" alt="Asian cuisine" style="width:100%; height: 400px; object-fit: cover;">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer" id="contact">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <h3>&#127843; Salmon House</h3>
+        <p>Sushi & Asian Food in Ceres. Freshly prepared with love, served with pride.</p>
+      </div>
+      <div>
+        <h4>Quick Links</h4>
+        <ul class="footer-links">
+          <li><a href="/">Home</a></li>
+          <li><a href="/menu.html">Order Online</a></li>
+          <li><a href="#about">About Us</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Contact</h4>
+        <ul class="footer-links">
+          <li>&#128222; 084 301 1707</li>
+          <li>&#128172; WhatsApp Us</li>
+          <li><a href="https://www.facebook.com/salmonhouseceres/" target="_blank">&#128101; Facebook</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Visit Us</h4>
+        <ul class="footer-links">
+          <li>25 Voortrekker Road</li>
+          <li>Ceres, 6835</li>
+          <li>Open Daily 11:00 - 22:00</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      &copy; 2024 Salmon House. All rights reserved.
+    </div>
+  </footer>
+
+  <script src="/js/menu-data.js"></script>
+  <script src="/js/cart.js"></script>
+  <script>
+    // Navbar scroll effect
+    window.addEventListener('scroll', () => {
+      document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
+    });
+
+    // Popular items
+    const popularItems = [
+      { ...MENU.sushiSpecials.items.find(i => i.id === 'ss5'), emoji: '🌹' },
+      { ...MENU.comboPlatters.items.find(i => i.id === 'cp12'), emoji: '🍱' },
+      { ...MENU.sushiSpecials.items.find(i => i.id === 'ss8'), emoji: '🐉' },
+      { ...MENU.thaiDishes.items.find(i => i.id === 't3a'), emoji: '🍛' },
+      { ...MENU.chicken.items.find(i => i.id === 'c1'), emoji: '🥜' },
+      { ...MENU.sashimi.items.find(i => i.id === 'sa1'), emoji: '🐟' },
+      { ...MENU.pokeBowl.items[0], emoji: '🥗' },
+      { ...MENU.sushiSpecials.items.find(i => i.id === 'ss10'), emoji: '💣' }
+    ];
+
+    const grid = document.getElementById('popularGrid');
+    popularItems.forEach(item => {
+      const card = document.createElement('div');
+      card.className = 'popular-card';
+      card.innerHTML = `
+        <div class="popular-img">
+          <span>${item.emoji}</span>
+          <span class="price-tag">R${item.price}</span>
+        </div>
+        <div class="popular-info">
+          <h3>${item.name}</h3>
+          <p>${item.desc}</p>
+          <button class="add-btn" onclick="Cart.addItem({id:'${item.id}',name:'${item.name.replace(/'/g,"\\'")}',price:${item.price}})">
+            Add to Order
+          </button>
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+  </script>
+</body>
+</html>

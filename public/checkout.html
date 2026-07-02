@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout | Salmon House - Ceres</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍣</text></svg>">
+  <script src="https://js.yoco.com/sdk/v1/yoco-sdk-web.js"></script>
+</head>
+<body class="checkout-page">
+  <!-- NAVBAR -->
+  <nav class="navbar scrolled">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo">
+        <div class="nav-logo-icon">SH</div>
+        Salmon House
+      </a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="/">Home</a></li>
+        <li><a href="/menu.html">Menu</a></li>
+        <li><a href="/#about">About</a></li>
+        <li><a href="/#contact">Contact</a></li>
+      </ul>
+      <a href="/checkout.html" class="nav-cart">
+        <span>&#128722;</span> Cart
+        <span class="cart-badge hidden">0</span>
+      </a>
+      <button class="mobile-toggle" onclick="document.getElementById('navLinks').classList.toggle('open')">&#9776;</button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <div class="checkout-hero">
+    <h1 style="font-size:2rem;">Checkout</h1>
+    <p>Review your order and schedule pickup</p>
+  </div>
+
+  <!-- CHECKOUT LAYOUT -->
+  <div class="checkout-layout">
+    <!-- Form -->
+    <div class="checkout-form-card">
+      <h2>&#128100; Your Details</h2>
+      <form id="checkoutForm">
+        <div class="form-group">
+          <label>Full Name <span class="required">*</span></label>
+          <input type="text" class="form-input" id="customerName" required placeholder="Your name">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Phone Number <span class="required">*</span></label>
+            <input type="tel" class="form-input" id="customerPhone" required placeholder="084 301 1707">
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" class="form-input" id="customerEmail" placeholder="Optional">
+          </div>
+        </div>
+
+        <h2 style="margin-top:32px;">&#128197; Pickup Schedule</h2>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Pickup Date <span class="required">*</span></label>
+            <input type="date" class="form-input" id="pickupDate" required>
+          </div>
+          <div class="form-group">
+            <label>Pickup Time <span class="required">*</span></label>
+            <select class="form-input" id="pickupTime" required>
+              <option value="">Select a time</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Special Instructions</label>
+          <textarea class="form-input" id="specialInstructions" placeholder="Any allergies or special requests?"></textarea>
+        </div>
+      </form>
+    </div>
+
+    <!-- Order Summary -->
+    <div class="order-summary-card">
+      <h2>&#128722; Order Summary</h2>
+      <div id="summaryContent">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Success Modal -->
+  <div id="successModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9999; display:none; align-items:center; justify-content:center;">
+    <div style="background:white; border-radius:var(--radius-lg); padding:48px; text-align:center; max-width:440px; margin:20px; box-shadow:var(--shadow-xl);">
+      <div style="font-size:4rem; margin-bottom:16px;">&#127881;</div>
+      <h2 style="margin-bottom:8px;">Order Confirmed!</h2>
+      <p style="color:var(--gray-500); margin-bottom:16px;">Your order has been placed successfully.</p>
+      <p style="font-size:1.1rem; margin-bottom:4px;">Order ID:</p>
+      <p id="successOrderId" style="font-size:1.5rem; font-weight:700; color:var(--red); margin-bottom:24px;"></p>
+      <p style="color:var(--gray-500); font-size:0.9rem; margin-bottom:24px;">
+        You'll receive updates when your order is being prepared and when it's ready for pickup.
+      </p>
+      <a id="trackLink" href="#" class="btn btn-primary btn-lg" style="width:100%; justify-content:center;">Track Your Order</a>
+    </div>
+  </div>
+
+  <script src="/js/menu-data.js"></script>
+  <script src="/js/cart.js"></script>
+  <script>
+    let yocoSDK = null;
+
+    // Load Yoco config
+    async function initYoco() {
+      try {
+        const res = await fetch('/api/config');
+        const config = await res.json();
+        yocoSDK = new window.YocoSDK({ publicKey: config.yocoPublicKey });
+      } catch (e) {
+        console.log('Yoco SDK init deferred — will retry on payment');
+      }
+    }
+    initYoco();
+
+    // Set min date to today
+    const dateInput = document.getElementById('pickupDate');
+    const today = new Date();
+    dateInput.min = today.toISOString().split('T')[0];
+    dateInput.value = today.toISOString().split('T')[0];
+
+    // Generate time slots (11:00 - 21:30 in 30min intervals)
+    function generateTimeSlots() {
+      const select = document.getElementById('pickupTime');
+      const selectedDate = dateInput.value;
+      const isToday = selectedDate === today.toISOString().split('T')[0];
+      const now = new Date();
+      const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+      select.innerHTML = '<option value="">Select a time</option>';
+
+      for (let h = 11; h <= 21; h++) {
+        for (let m = 0; m < 60; m += 30) {
+          if (h === 21 && m > 30) continue;
+          const totalMinutes = h * 60 + m;
+
+          // For today, only show times at least 30 min from now
+          if (isToday && totalMinutes < currentMinutes + 30) continue;
+
+          const timeStr = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}`;
+          const label = `${h > 12 ? h - 12 : h}:${m.toString().padStart(2,'0')} ${h >= 12 ? 'PM' : 'AM'}`;
+          select.innerHTML += `<option value="${timeStr}">${label}</option>`;
+        }
+      }
+    }
+    generateTimeSlots();
+    dateInput.addEventListener('change', generateTimeSlots);
+
+    // Render order summary
+    function renderSummary() {
+      const items = Cart.getItems();
+      const content = document.getElementById('summaryContent');
+
+      if (items.length === 0) {
+        content.innerHTML = `
+          <div class="empty-cart">
+            <p>&#128722;</p>
+            <h3>Your cart is empty</h3>
+            <p style="font-size:0.9rem;">Add items from our menu to get started.</p>
+            <a href="/menu.html" class="btn btn-primary" style="margin-top:16px;">Browse Menu</a>
+          </div>
+        `;
+        return;
+      }
+
+      const subtotal = Cart.getTotal();
+      let html = '<div class="summary-items">';
+
+      items.forEach(item => {
+        html += `
+          <div class="summary-item">
+            <div class="summary-item-info">
+              <div class="summary-item-name">${item.name}</div>
+              <div class="summary-item-qty">Qty: ${item.qty} &times; R${item.price}</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span class="summary-item-price">R${(item.price * item.qty).toFixed(2)}</span>
+              <button class="summary-item-remove" onclick="Cart.removeItem('${item.id}'); renderSummary();">&times;</button>
+            </div>
+          </div>
+        `;
+      });
+
+      html += '</div>';
+      html += `
+        <div class="summary-totals">
+          <div class="summary-row">
+            <span>Subtotal</span>
+            <span>R${subtotal.toFixed(2)}</span>
+          </div>
+          <div class="summary-row total">
+            <span>Total</span>
+            <span class="summary-price">R${subtotal.toFixed(2)}</span>
+          </div>
+        </div>
+        <button type="button" class="btn btn-primary pay-btn" id="payBtn" onclick="handlePayment()">
+          Pay R${subtotal.toFixed(2)} with Yoco
+        </button>
+      `;
+
+      content.innerHTML = html;
+    }
+
+    function onCartUpdate() { renderSummary(); }
+    renderSummary();
+
+    // Payment
+    async function handlePayment() {
+      const form = document.getElementById('checkoutForm');
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
+
+      const items = Cart.getItems();
+      if (items.length === 0) {
+        alert('Your cart is empty!');
+        return;
+      }
+
+      const total = Cart.getTotal();
+      const payBtn = document.getElementById('payBtn');
+      payBtn.disabled = true;
+      payBtn.textContent = 'Processing...';
+
+      // Ensure Yoco is initialized
+      if (!yocoSDK) {
+        try {
+          const res = await fetch('/api/config');
+          const config = await res.json();
+          yocoSDK = new window.YocoSDK({ publicKey: config.yocoPublicKey });
+        } catch (e) {
+          payBtn.disabled = false;
+          payBtn.textContent = `Pay R${total.toFixed(2)} with Yoco`;
+          alert('Unable to initialize payment. Please try again.');
+          return;
+        }
+      }
+
+      yocoSDK.showPopup({
+        amountInCents: Math.round(total * 100),
+        currency: 'ZAR',
+        name: 'Salmon House',
+        description: `${items.length} item(s)`,
+        callback: async function(result) {
+          if (result.error) {
+            payBtn.disabled = false;
+            payBtn.textContent = `Pay R${total.toFixed(2)} with Yoco`;
+            alert('Payment failed: ' + (result.error.message || 'Please try again.'));
+            return;
+          }
+
+          // Create order
+          try {
+            const orderRes = await fetch('/api/orders', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                customerName: document.getElementById('customerName').value,
+                customerPhone: document.getElementById('customerPhone').value,
+                customerEmail: document.getElementById('customerEmail').value,
+                items: items,
+                subtotal: total,
+                total: total,
+                pickupDate: document.getElementById('pickupDate').value,
+                pickupTime: document.getElementById('pickupTime').value,
+                specialInstructions: document.getElementById('specialInstructions').value,
+                paymentToken: result.id
+              })
+            });
+
+            const data = await orderRes.json();
+
+            if (data.success) {
+              Cart.clear();
+              document.getElementById('successOrderId').textContent = data.orderId;
+              document.getElementById('trackLink').href = `/track/${data.orderId}`;
+              const modal = document.getElementById('successModal');
+              modal.style.display = 'flex';
+            } else {
+              throw new Error(data.error || 'Order failed');
+            }
+          } catch (e) {
+            alert('Order submission failed. Your payment was processed — please contact us at 084 301 1707 with your details.');
+          }
+
+          payBtn.disabled = false;
+          payBtn.textContent = `Pay R${total.toFixed(2)} with Yoco`;
+        }
+      });
+    }
+  </script>
+</body>
+</html>
