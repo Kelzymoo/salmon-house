@@ -209,8 +209,11 @@
             <span class="summary-price">R${subtotal.toFixed(2)}</span>
           </div>
         </div>
-        <button type="button" class="btn btn-primary pay-btn" id="payBtn" onclick="handlePayment()">
-          Pay R${subtotal.toFixed(2)} with Yoco
+        <button type="button" class="btn btn-primary pay-btn" id="pickupPayBtn" onclick="handlePickupPayment()" style="width:100%;padding:16px;font-size:1.1rem;cursor:pointer;">
+          &#128176; Pay at Pickup — R${subtotal.toFixed(2)}
+        </button>
+        <button type="button" disabled style="width:100%;padding:16px;font-size:1rem;margin-top:10px;background:#ccc;color:#888;border:none;border-radius:8px;cursor:not-allowed;position:relative;">
+          &#128179; Pay with Yoco — Coming Soon
         </button>
       `;
 
@@ -220,7 +223,62 @@
     function onCartUpdate() { renderSummary(); }
     renderSummary();
 
-    // Payment
+    // Pay at Pickup
+    async function handlePickupPayment() {
+      const form = document.getElementById('checkoutForm');
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
+
+      const items = Cart.getItems();
+      if (items.length === 0) {
+        alert('Your cart is empty!');
+        return;
+      }
+
+      const total = Cart.getTotal();
+      const payBtn = document.getElementById('pickupPayBtn');
+      payBtn.disabled = true;
+      payBtn.textContent = 'Placing order...';
+
+      try {
+        const orderRes = await fetch('/api/orders', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            customerName: document.getElementById('customerName').value,
+            customerPhone: document.getElementById('customerPhone').value,
+            customerEmail: document.getElementById('customerEmail').value,
+            items: items,
+            subtotal: total,
+            total: total,
+            pickupDate: document.getElementById('pickupDate').value,
+            pickupTime: document.getElementById('pickupTime').value,
+            specialInstructions: document.getElementById('specialInstructions').value,
+            paymentToken: null
+          })
+        });
+
+        const data = await orderRes.json();
+
+        if (data.success) {
+          Cart.clear();
+          document.getElementById('successOrderId').textContent = data.orderId;
+          document.getElementById('trackLink').href = '/track/' + data.orderId;
+          document.getElementById('successModal').style.display = 'flex';
+        } else {
+          throw new Error(data.error || 'Order failed');
+        }
+      } catch (e) {
+        alert('Order submission failed. Please try again or call us at 084 301 1707.');
+      }
+
+      payBtn.disabled = false;
+      payBtn.textContent = 'Pay at Pickup — R' + total.toFixed(2);
+    }
+
+    // Yoco Payment (disabled for now)
     async function handlePayment() {
       const form = document.getElementById('checkoutForm');
       if (!form.checkValidity()) {
