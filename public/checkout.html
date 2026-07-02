@@ -7,6 +7,16 @@
   <link rel="stylesheet" href="/css/styles.css">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍣</text></svg>">
   <script src="https://js.yoco.com/sdk/v1/yoco-sdk-web.js"></script>
+  <style>
+    .yc-overlay, .yc-popup, .yoco-popup,
+    div[id^="yoco"], iframe[src*="yoco"] {
+      z-index: 999999 !important;
+    }
+    .yc-overlay {
+      position: fixed !important;
+      inset: 0 !important;
+    }
+  </style>
 </head>
 <body class="checkout-page">
   <!-- NAVBAR -->
